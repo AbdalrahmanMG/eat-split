@@ -2,31 +2,41 @@ import React, { useState } from 'react'
 import Button from './Button'
 
 export default function BillForm({ selectedFriend, handleSplitBill }) {
-    const [bill, setBill] = useState('')
-    const [paidByUser, setPaidByUser] = useState('')
-    const [whoIspaying, setWhoIspaying] = useState('')
-    const paidByFriend = bill ? bill - paidByUser : ''
+
+    const [billData, setBillData] = useState({
+        bill: '',
+        paidByUser: '',
+        whoIspaying: '',
+    })
+
+    const paidByFriend = billData.bill ? billData.bill - billData.paidByUser : ''
+
+    const onChangeInput = (e)=>{
+        let {value, name}= e.target
+        setBillData({...billData, [name]: value})
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        if (!bill || !paidByUser) return
-        handleSplitBill(whoIspaying === 'user' ? - paidByFriend : paidByFriend)
+        if (!billData.bill || !billData.paidByUser) return
+        handleSplitBill(billData.whoIspaying === 'user' ? - paidByFriend : paidByFriend)
     }
+
     return (
         <form onSubmit={handleSubmit} className='form-split-bill'>
             <h2>Split bill with {selectedFriend.name}</h2>
 
             <label htmlFor="bValue">💰 Bill value</label>
-            <input type="number" name='bValue' id='bValue' value={bill} onChange={e => setBill(Number(e.target.value))} />
+            <input type="number" name='bill' id='bValue' value={billData.bill} onChange={onChangeInput} />
 
             <label htmlFor="expense">🕴 YOur expense</label>
-            <input type="number" name='expense' id='expense' value={paidByUser} onChange={e => setPaidByUser(Number(e.target.value))} />
+            <input type="number" name='paidByUser' id='expense' value={billData.paidByUser} onChange={onChangeInput} />
 
             <label htmlFor="xExpense">👬 {selectedFriend.name}'s expense</label>
             <input type="number" disabled name='xExpense' id='xExpense' value={paidByFriend} />
 
             <label htmlFor="payBill">🤑 who is paying the bill?</label>
-            <select name='payBill' id='payBill' value={whoIspaying} onChange={e => setWhoIspaying(e.target.value)}>
+            <select name='whoIspaying' id='payBill' value={billData.whoIspaying} onChange={onChangeInput}>
                 <option value="user">You</option>
                 <option value='friend'>{selectedFriend.name}</option>
             </select>
